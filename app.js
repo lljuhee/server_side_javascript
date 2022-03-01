@@ -1,10 +1,64 @@
 var express  = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 app.locals.pretty = true; //코드를 예쁘게 보이게 해줌.
 app.set('view engine','pug');
 app.set('views','./views'); //생략 가능, views가 디폴트 값.
 app.use(express.static('public'));
 //public이란 디렉토리를 정적인 파일이 위치하는 디렉토리로 설정
+app.use(bodyParser.urlencoded({extended: false}))
+app.get('/form',function(req,res){
+  res.render('form');
+});
+app.get('/form_receiver',function(req,res){
+  var title = req.query.title;
+  var description = req.query.description;
+  res.send(title+','+description);
+});
+
+app.post('/form_receiver',function(req,res){
+  var title = req.body.title;
+  var description = req.body.description;
+  res.send(title+','+description);
+})
+
+
+app.get('/topic',function(req,res){
+  var topics = [
+    'javascrip is...',
+    'Nodejs is...',
+    'Express is...'
+  ];
+  var output =  `
+  <a href="/topic?id=0">JavaScript</a><br>
+  <a href="/topic?id=1">Nodejs</a><br>
+  <a href="/topic?id=2">Express</a><br><br>
+  ${topics[req.query.id]}
+  `
+  res.send(output);
+})
+
+
+app.get('/topic/:id', function(req, res){
+  var topics = [
+    'Javascript is....',
+    'Nodejs is...',
+    'Express is...'
+  ];
+  var output = `
+  <a href="/topic/0">JavaScript</a><br>
+  <a href="/topic/1">Nodejs</a><br>
+  <a href="/topic/2">Express</a><br><br>
+  ${topics[req.params.id]}
+  `
+  res.send(output);
+})
+
+app.get('/topic/:id/:mode', function(req, res){
+  res.send(req.params.id+','+req.params.mode)
+})
+
+
 
 app.get('/template',function(req, res){
   res.render('temp',{time:Date(),_title:'Puge'}); // /views/temp.pug 를 rendering해서 화면에 나타나게함.
